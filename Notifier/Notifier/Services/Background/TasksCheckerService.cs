@@ -96,10 +96,12 @@ public class TasksCheckerService : BackgroundService
                 continue;
             }
 
-            var msgLines = msg.Text
-                  .Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
-                  .Select(x => x.Trim()) // убираем пробелы и \r
-                  .ToArray();
+            var normalizedText = msg.Text.Replace("\r\n", "\n").Replace("\r", "\n");
+
+            var msgLines = normalizedText
+                .Split('\n', StringSplitOptions.None)
+                .Select(x => x.Trim())
+                .ToArray();
 
             if (msgLines.Length == 0)
             {
@@ -111,7 +113,7 @@ public class TasksCheckerService : BackgroundService
 
             if (whatsHappenedLine.StartsWith("Создана новая задача"))
             {
-                var firstSeparatorIndex = Array.FindIndex(msgLines, x => x == LongLineSeparatorForCreate);
+                var firstSeparatorIndex = Array.FindIndex(msgLines, x => x.Trim() == LongLineSeparatorForCreate);
                 var telegramNotificationDto = new TelegramNotificationDto(
                     msgLines[firstSeparatorIndex + 1],
                     msgLines[firstSeparatorIndex + 2].Replace(" открыто", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty),
@@ -121,7 +123,7 @@ public class TasksCheckerService : BackgroundService
             }
             else if (whatsHappenedLine.Contains("была обновлена"))
             {
-                var firstSeparatorIndex = Array.FindIndex(msgLines, x => x == LongLineSeparatorForCreate);
+                var firstSeparatorIndex = Array.FindIndex(msgLines, x => x.Trim() == LongLineSeparatorForUpdate);
                 if (firstSeparatorIndex == -1 || firstSeparatorIndex + 2 >= msgLines.Length)
                 {
                     _logger.LogWarning("Invalid message format: separator not found or insufficient lines");
