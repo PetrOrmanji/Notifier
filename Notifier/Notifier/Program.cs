@@ -20,4 +20,5 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddHostedService<TasksCheckerService>();
 
 var host = builder.Build();
+host.Map("/", () => "Started succesfully");
 host.Run();

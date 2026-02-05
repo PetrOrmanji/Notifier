@@ -53,8 +53,6 @@ public class MailClient
             resultList.Add(new ImapMessageDto(message.TextBody, msgDate.Value));
         }
 
-        resultList.Add(new ImapMessageDto("Создана новая задача #10718 <http://redmine.payture.com/issues/10718>\r\n(Антон Елисеев).\r\n------------------------------\r\nTask #10718: Перенос пароля метода getbininfo в Vault\r\n<http://redmine.payture.com/issues/10718> открыто\r\n\r\n   - *Автор: *Антон Елисеев\r\n   - *Статус: *Projected\r\n   - *Приоритет: *Normal\r\n   - *Назначена: *Петр Орманжи\r\n   - *Дата начала: *2026-02-02\r\n   - *Срок завершения: *2026-02-26\r\n   - *Сервис: *GetBinInfo\r\n   - *Часы Dev: *0\r\n   - *Часы QA: *0\r\n\r\nПереносим пароль в {env}/admin/getbininfo\r\n\r\nЗатронет ручки:\r\ngetbininfo/updateBinBase/(.*)\r\ngetbininfo/Reload/(.*)\r\ngetbininfo/save/(.*)\r\ngetbininfo/remove/(.*)\r\n------------------------------\r\n\r\nYou have received this notification because you have either subscribed to\r\nit, or are involved in it...", DateTime.Now));
-
         return resultList.ToArray();
     }
 
