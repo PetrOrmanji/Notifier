@@ -21,5 +21,5 @@ public class TelegramNotificationDto
     }
 
     public override string ToString()
-         => $"📌 Назначили задачу ({DateTime: dd.MM.yyyy HH:mm}):\n<a href=\"{Link}\">{Text}</a>";
+         => $"📌 Назначили задачу ({DateTime:dd.MM.yyyy HH:mm}):\n<a href=\"{Link}\">{Text}</a>";
 }
