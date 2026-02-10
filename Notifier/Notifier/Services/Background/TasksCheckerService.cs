@@ -24,7 +24,7 @@ public class TasksCheckerService : BackgroundService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _timer = new(TimeSpan.FromMinutes(5));
-        _lastCheckDateTime = DateTime.Now.AddMinutes(-30);
+        _lastCheckDateTime = DateTime.UtcNow.AddMinutes(-30);
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)

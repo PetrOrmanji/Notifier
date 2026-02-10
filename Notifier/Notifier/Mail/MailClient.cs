@@ -42,15 +42,17 @@ public class MailClient
         
         foreach (var msgId in msgsIds)
         {
-            var msgDate = msgsDates.FirstOrDefault(x => x.UniqueId == msgId)?.Date.LocalDateTime;
+            var msgDate = msgsDates.FirstOrDefault(x => x.UniqueId == msgId)?.Date.UtcDateTime;
 
             if (msgDate == null || msgDate <= dateTime)
             {
                 continue;
             }
 
+            var msgMoscowDate = msgDate.Value.AddHours(3);
+
             var message = specificFolder.GetMessage(msgId);
-            resultList.Add(new ImapMessageDto(message.TextBody, msgDate.Value));
+            resultList.Add(new ImapMessageDto(message.TextBody, msgMoscowDate));
         }
 
         return resultList.ToArray();
