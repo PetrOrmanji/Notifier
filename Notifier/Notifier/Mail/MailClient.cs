@@ -13,7 +13,6 @@ public class MailClient
     private readonly string _userName;
     private readonly string _password;
     private readonly string _folder;
-    private readonly ImapClient _imapClient;
 
     public MailClient(string userName, string password, string folder)
     {
@@ -24,19 +23,20 @@ public class MailClient
         _userName = userName;
         _password = password;
         _folder = folder;
-
-        _imapClient = new ImapClient();
     }
 
     public async Task<ImapMessageDto[]> GetMessagesDeliveredAfter(DateTime dateTime)
     {
-        await EnsureConnectedAsync();
+        using var client = new ImapClient();
 
-        var specificFolder = _imapClient.GetFolder(_folder);
-        specificFolder.Open(FolderAccess.ReadOnly);
+        await client.ConnectAsync(ImapHost, ImapPort, SecureSocketOptions.SslOnConnect);
+        await client.AuthenticateAsync(_userName, _password);
 
-        var msgsIds = specificFolder.Search(SearchQuery.DeliveredAfter(dateTime));
-        var msgsDates = specificFolder.Fetch(msgsIds, MessageSummaryItems.InternalDate);
+        var specificFolder = await client.GetFolderAsync(_folder);
+        await specificFolder.OpenAsync(FolderAccess.ReadOnly);
+
+        var msgsIds = await specificFolder.SearchAsync(SearchQuery.DeliveredAfter(dateTime));
+        var msgsDates = await specificFolder.FetchAsync(msgsIds, MessageSummaryItems.InternalDate);
 
         var resultList = new List<ImapMessageDto>();
         
@@ -51,19 +51,12 @@ public class MailClient
 
             var msgMoscowDate = msgDate.Value.AddHours(3);
 
-            var message = specificFolder.GetMessage(msgId);
+            var message = await specificFolder.GetMessageAsync(msgId);
             resultList.Add(new ImapMessageDto(message.TextBody, msgMoscowDate));
         }
 
-        return resultList.ToArray();
-    }
+        await client.DisconnectAsync(true);
 
-    private async Task EnsureConnectedAsync()
-    {
-        if (!_imapClient.IsConnected)
-        {
-            await _imapClient.ConnectAsync(ImapHost, ImapPort, SecureSocketOptions.SslOnConnect);
-            await _imapClient.AuthenticateAsync(_userName, _password);
-        }
+        return resultList.ToArray();
     }
 }
